@@ -1,14 +1,8 @@
 import { AnalysisStep } from "./AnalysisStep";
 import { AlignmentScore } from "./AlignmentScore";
+import type { AnalysisResult } from "@/lib/api/analyze";
 
-export interface AnalysisResult {
-  step0: string;
-  step1: string;
-  step2: string;
-  step3: string;
-  step4: number;
-  step5: string;
-}
+export type { AnalysisResult };
 
 interface AnalysisResultsProps {
   result: AnalysisResult | null;

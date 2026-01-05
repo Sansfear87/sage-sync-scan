@@ -5,6 +5,7 @@ import { DocumentUpload, Document } from "@/components/DocumentUpload";
 import { AnalysisResults, AnalysisResult } from "@/components/AnalysisResults";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { analyzeDocuments } from "@/lib/api/analyze";
 
 const Index = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -14,7 +15,7 @@ const Index = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const { toast } = useToast();
 
-  const simulateAnalysis = async () => {
+  const handleAnalyze = async () => {
     if (documents.length < 2) {
       toast({
         title: "Not enough documents",
@@ -29,58 +30,28 @@ const Index = () => {
     setCurrentStep(0);
     setStreamingContent("");
 
-    // Simulate step-by-step analysis with mock data
-    const mockResults: AnalysisResult = {
-      step0: documents
-        .map(
-          (doc, i) =>
-            `Document ${i + 1} – Extracted Text:\n"${doc.content.slice(0, 200)}${doc.content.length > 200 ? "..." : ""}"`
-        )
-        .join("\n\n"),
-      step1: documents
-        .map(
-          (doc, i) =>
-            `Document ${i + 1} Summary:\n• Key claim: Analysis of provided content\n• Main focus: ${doc.name}\n• Intent: Information sharing`
-        )
-        .join("\n\n"),
-      step2:
-        "Cross-Document Analysis:\n\n• Common themes identified across documents\n• Similar terminology and concepts detected\n• Shared context and references found\n• Minor variations in presentation style",
-      step3:
-        "Discrepancy Analysis:\n\n• No major contradictions detected\n• Minor differences in emphasis noted\n• Some documents provide additional context not present in others\n• Overall consistency maintained across sources",
-      step4: 78,
-      step5:
-        "The documents show strong alignment with minor variations. The core claims and intent are consistent across all sources. Slight differences exist in emphasis and detail level, but these do not constitute contradictions. The alignment score of 78 reflects mostly aligned content with minor inconsistencies typical of multi-source documentation.",
-    };
-
-    const steps = [
-      mockResults.step0,
-      mockResults.step1,
-      mockResults.step2,
-      mockResults.step3,
-      `Processing alignment score...`,
-      mockResults.step5,
-    ];
-
-    for (let i = 0; i < steps.length; i++) {
-      setCurrentStep(i);
-      setStreamingContent("");
-      
-      // Simulate streaming text character by character
-      const text = steps[i];
-      for (let j = 0; j < text.length; j++) {
-        await new Promise((resolve) => setTimeout(resolve, 5));
-        setStreamingContent((prev) => prev + text[j]);
-      }
-      
-      await new Promise((resolve) => setTimeout(resolve, 300));
-    }
-
-    setResult(mockResults);
-    setIsAnalyzing(false);
-    
-    toast({
-      title: "Analysis Complete",
-      description: `Alignment score: ${mockResults.step4}/100`,
+    await analyzeDocuments({
+      documents,
+      onStep: (step, content) => {
+        setCurrentStep(step);
+        setStreamingContent(content);
+      },
+      onComplete: (analysisResult) => {
+        setResult(analysisResult);
+        setIsAnalyzing(false);
+        toast({
+          title: "Analysis Complete",
+          description: `Alignment score: ${analysisResult.step4}/100`,
+        });
+      },
+      onError: (error) => {
+        setIsAnalyzing(false);
+        toast({
+          title: "Analysis Failed",
+          description: error,
+          variant: "destructive",
+        });
+      },
     });
   };
 
@@ -133,7 +104,7 @@ const Index = () => {
             <Button
               variant="glow"
               size="xl"
-              onClick={simulateAnalysis}
+              onClick={handleAnalyze}
               disabled={!canAnalyze}
               className="min-w-[200px]"
             >
