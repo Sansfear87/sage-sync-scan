@@ -1,5 +1,8 @@
 import * as pdfjsLib from "pdfjs-dist";
-import pdfWorker from "pdfjs-dist/build/pdf.worker?worker";
+
+// Use CDN worker (Vite-safe, production-safe)
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // Tell pdfjs where its worker is
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
