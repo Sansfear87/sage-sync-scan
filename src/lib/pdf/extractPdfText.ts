@@ -1,6 +1,6 @@
 import * as pdfjsLib from "pdfjs-dist";
 
-// ✅ Production-safe worker using CDN
+// ✅ Correct, production-safe worker configuration
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
@@ -22,3 +22,4 @@ export async function extractPdfText(file: File): Promise<string> {
 
   return text.trim();
 }
+
