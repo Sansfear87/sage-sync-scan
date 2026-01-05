@@ -1,14 +1,12 @@
 import * as pdfjsLib from "pdfjs-dist";
 
-// Use CDN worker (Vite-safe, production-safe)
+// ✅ Production-safe worker (CDN)
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-// Tell pdfjs where its worker is
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
-
 export async function extractPdfText(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
+
   const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
 
   let text = "";
@@ -24,3 +22,4 @@ export async function extractPdfText(file: File): Promise<string> {
 
   return text.trim();
 }
+
