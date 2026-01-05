@@ -1,8 +1,8 @@
 import * as pdfjsLib from "pdfjs-dist";
 
-// ✅ Correct, production-safe worker configuration
+// ✅ Pin to a CDNJS-available worker version
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 export async function extractPdfText(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
@@ -22,4 +22,3 @@ export async function extractPdfText(file: File): Promise<string> {
 
   return text.trim();
 }
-
