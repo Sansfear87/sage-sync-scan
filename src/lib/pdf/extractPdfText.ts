@@ -1,14 +1,17 @@
-// 🔒 FORCE legacy pdf.js build (version-safe)
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
-
-// ✅ Matching legacy worker
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
 export async function extractPdfText(file: File): Promise<string> {
+  // ⛔ Dynamic import (prevents Vite prebundling)
+  const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+
+  // ⛔ Disable worker completely
+  (pdfjsLib as any).GlobalWorkerOptions.workerSrc = "";
+  (pdfjsLib as any).disableWorker = true;
+
   const buffer = await file.arrayBuffer();
 
-  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const pdf = await (pdfjsLib as any).getDocument({
+    data: buffer,
+    disableWorker: true,
+  }).promise;
 
   let text = "";
 
@@ -16,9 +19,7 @@ export async function extractPdfText(file: File): Promise<string> {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
 
-    text += content.items
-      .map((item: any) => item.str)
-      .join(" ") + "\n";
+    text += content.items.map((item: any) => item.str).join(" ") + "\n";
   }
 
   return text.trim();
