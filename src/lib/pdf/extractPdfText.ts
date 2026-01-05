@@ -1,6 +1,7 @@
-import * as pdfjsLib from "pdfjs-dist";
+// 🔒 FORCE legacy pdf.js build (version-safe)
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 
-// ✅ Pin to a CDNJS-available worker version
+// ✅ Matching legacy worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
