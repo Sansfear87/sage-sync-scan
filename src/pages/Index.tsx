@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { extractPdfText } from "../lib/pdf/extractPdfText";
 import { Scan, Sparkles } from "lucide-react";
 import { Header } from "@/components/Header";
 import { DocumentUpload, Document } from "@/components/DocumentUpload";
