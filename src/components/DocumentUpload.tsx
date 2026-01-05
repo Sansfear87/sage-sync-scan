@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { extractPdfText } from "../lib/pdf/extractPdfText";
 import { Upload, FileText, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -46,24 +47,39 @@ export function DocumentUpload({
     [documents, maxDocuments]
   );
 
-  const processFiles = async (files: File[]) => {
-    const remainingSlots = maxDocuments - documents.length;
-    const filesToProcess = files.slice(0, remainingSlots);
+const processFiles = async (files: File[]) => {
+  const remainingSlots = maxDocuments - documents.length;
+  const filesToProcess = files.slice(0, remainingSlots);
 
-    const newDocuments: Document[] = [];
+  const newDocuments: Document[] = [];
 
-    for (const file of filesToProcess) {
-      const content = await file.text();
-      newDocuments.push({
-        id: crypto.randomUUID(),
-        name: file.name,
-        content,
-        type: "file",
-      });
+  for (const file of filesToProcess) {
+    let content = "";
+
+    // ✅ PDF handling
+    if (file.type === "application/pdf") {
+      content = await extractPdfText(file);
+
+      if (!content || content.length < 50) {
+        alert(`"${file.name}" looks scanned. OCR required.`);
+        continue;
+      }
+    } else {
+      // ✅ Non-PDF files
+      content = await file.text();
     }
 
-    onDocumentsChange([...documents, ...newDocuments]);
-  };
+    newDocuments.push({
+      id: crypto.randomUUID(),
+      name: file.name,
+      content,
+      type: "file",
+    });
+  }
+
+  onDocumentsChange([...documents, ...newDocuments]);
+};
+
 
   const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
