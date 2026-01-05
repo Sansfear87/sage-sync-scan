@@ -1,14 +1,14 @@
 export async function extractPdfText(file: File): Promise<string> {
-  // ⛔ Dynamic import (prevents Vite prebundling)
-  const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+  // ✅ dynamic import prevents Vite prebundle
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf");
 
-  // ⛔ Disable worker completely
-  (pdfjsLib as any).GlobalWorkerOptions.workerSrc = "";
-  (pdfjsLib as any).disableWorker = true;
+  // ✅ disable worker completely
+  (pdfjs as any).GlobalWorkerOptions.workerSrc = "";
+  (pdfjs as any).disableWorker = true;
 
   const buffer = await file.arrayBuffer();
 
-  const pdf = await (pdfjsLib as any).getDocument({
+  const pdf = await (pdfjs as any).getDocument({
     data: buffer,
     disableWorker: true,
   }).promise;
@@ -24,3 +24,5 @@ export async function extractPdfText(file: File): Promise<string> {
 
   return text.trim();
 }
+
+
