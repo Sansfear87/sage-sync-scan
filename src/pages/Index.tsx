@@ -129,7 +129,7 @@ const Index = () => {
           </section>
 
           {/* Analyze Button */}
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-2">
             <Button
               variant="glow"
               size="xl"
@@ -149,6 +149,11 @@ const Index = () => {
                 </>
               )}
             </Button>
+            {documents.length < 2 && (
+              <p className="text-sm text-muted-foreground">
+                Upload at least {2 - documents.length} more document{2 - documents.length > 1 ? 's' : ''} to start analysis
+              </p>
+            )}
           </div>
 
           {/* Results Section */}
